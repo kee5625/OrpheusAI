@@ -1,0 +1,41 @@
+Skin diseases that will be included in the dataset:
+
+1. Acne Vulgaris
+    Common: One of the most prevalent skin conditions, especially among teenagers and young adults. 
+    It includes pimples, blackheads, and cysts, mostly on the face, back, and shoulders.
+
+2. Eczema (Atopic Dermatitis)
+    Common: A chronic condition that causes itchy, inflamed skin. Common in children but can occur 
+    at any age. Often triggers include allergens, stress, or harsh weather.
+
+3. Psoriasis
+    Common: An autoimmune disease causing rapid skin cell turnover, leading to thick, scaly patches.
+    It's often seen on the elbows, knees, and scalp.
+
+4. Seborrheic Dermatitis
+    Common: A chronic condition that causes scaly, red skin, typically on the scalp, face, and upper 
+    chest. It's often mistaken for dandruff or acne.
+
+5. Lichen Planus:
+    Moderate: An inflammatory condition that results in purple, itchy, flat-topped bumps, often on the 
+    wrists, lower back, or inside the mouth.
+
+6. Vitiligo:
+    Moderate: A condition that causes loss of skin pigment, leading to irregular, white patches of skin.
+    It can affect any area of the body.
+
+7. Basal Cell Carcinoma (BCC)
+    Rare: The most common type of skin cancer, but often not aggressive. BCC typically appears as a small,
+    pearly bump or growth, often on sun-exposed areas like the face, ears, and neck.
+
+8. Squamous Cell Carcinoma (SCC)
+    Rare: The second most common form of skin cancer. SCC often appears as a firm, red nodule or a scaly 
+    patch that may bleed or ulcerate, commonly on areas of the skin exposed to the sun.
+
+9. Melanoma
+    Rare: The most dangerous form of skin cancer. Melanoma usually appears as a new mole or changes in an 
+    existing mole. It can spread rapidly, so early detection is crucial.
+
+10. Pemphigus Vulgaris
+    Rare: Pemphigus vulgaris is a rare, autoimmune disorder that causes blisters on the skin and mucous 
+    membranes, such as the mouth, throat, and genitals. 
