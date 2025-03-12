@@ -36,6 +36,5 @@ Skin diseases that will be included in the dataset:
     Rare: The most dangerous form of skin cancer. Melanoma usually appears as a new mole or changes in an 
     existing mole. It can spread rapidly, so early detection is crucial.
 
-10. Pemphigus Vulgaris
-    Rare: Pemphigus vulgaris is a rare, autoimmune disorder that causes blisters on the skin and mucous 
-    membranes, such as the mouth, throat, and genitals. 
+10. Dermatofibroma
+    Rare: 
