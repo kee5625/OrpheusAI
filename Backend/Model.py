@@ -66,7 +66,7 @@ logdir = "C:/Users/karth/OneDrive/Desktop/UNIVERSITY OF CINCINNATI/Academics/Spr
 tensorboard_callback = keras.callbacks.TensorBoard(log_dir=logdir)
 
 checkpoint_callback = keras.callbacks.ModelCheckpoint(
-    "C:/Users/karth/OneDrive/Desktop/UNIVERSITY OF CINCINNATI/Academics/Spring 2025/Orpheus AI/OrpheusAI/Backend/v1.h5",
+    "C:/Users/karth/OneDrive/Desktop/UNIVERSITY OF CINCINNATI/Academics/Spring 2025/Orpheus AI/OrpheusAI/Backend/v1.keras",
     save_best_only=True,
     monitor="val_accuracy",
     mode="max"
