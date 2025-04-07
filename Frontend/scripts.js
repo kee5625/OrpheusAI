@@ -17,20 +17,25 @@ document.getElementById('contactForm').addEventListener('submit', function(e) {
     })
     .then(response => response.json())
     .then(data => {
+
+        // Clear previous data
+        const resultContainer = document.getElementById('resultContainer');
+        resultContainer.innerHTML = '';
+
         if (data.error) {
             alert(`Error: ${data.error}`);
         } else {
             // Display results in a user-friendly way
-            const resultDiv = document.createElement('div');
-            resultDiv.innerHTML = '<h3>Diagnosis (Top 3):</h3>';
+            // const resultDiv = document.createElement('div');
+            let resultHTML = '<h3>Diagnosis (Top 3):</h3>';
 
             data.top3.forEach((item, index) => {
                 // e.g. item.class == "6. Melanoma"
-                // strip off "6. " if you only want the name
+                // strip off "6. "
                 const nameParts = item.class.split('. ');
                 const diseaseName = (nameParts.length > 1) ? nameParts[1] : item.class;
                 
-                resultDiv.innerHTML += `
+                resultHTML += `
                     <p>
                       <strong>#${index + 1}:</strong> ${diseaseName}
                       <br>
@@ -39,7 +44,8 @@ document.getElementById('contactForm').addEventListener('submit', function(e) {
                 `;
             });
 
-            document.querySelector('.text-center').appendChild(resultDiv);
+            resultContainer.innerHTML = resultHTML;
+            //document.querySelector('.text-center').appendChild(resultDiv);
         }
     })
     .catch(error => {
