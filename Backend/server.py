@@ -18,7 +18,7 @@ ALLOWOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'bmp'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # Load the trained model
-model = keras.models.load_model('Backend/v1.keras')
+model = keras.models.load_model('Backend/v2.keras')
 
 # Class names
 CLASS_NAMES = [
@@ -79,11 +79,12 @@ def predict():
                     "confidence": float(predictions[0][idx])
                 })
             
-            
+            '''
             for pred in top3:
                 if pred["class"] == "2. Basal Cell Carcinoma":
                     pred["class"] = "Basal Cell Carcinoma or Melanoma"
             # Clean up uploaded file
+            '''
             os.remove(upload_path)
             
             return jsonify({"top3": top3})
