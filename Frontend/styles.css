@@ -10921,3 +10921,71 @@ footer.footer {
 #resultContainer {
   margin-top: 40px;
 }
+
+/* ---------- ABOUT PAGE EXTRAS ---------- */
+
+/* Re‑use the full‑height hero but with a subtle overlay */
+.masthead--about {
+  background-image: url('assets/img/bg-masthead.jpg');
+  background-size: cover;
+  background-position: center;
+  height: 60vh;
+  position: relative;
+}
+.masthead--about::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+}
+.masthead--about > .container {
+  position: relative; /* keep text above overlay */
+  padding-top: 5rem;
+  
+}
+
+/* Value cards */
+.value-card {
+  background: #ffffff;
+  border-radius: 1rem;
+  box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.075);
+  transition: transform 0.2s ease;
+}
+.value-card:hover {
+  transform: translateY(-4px);
+}
+
+/* Team cards */
+.team-card img {
+  border-top-left-radius: 1rem;
+  border-top-right-radius: 1rem;
+  height: 260px;
+  object-fit: cover;
+}
+.team-card .card-body {
+  padding-bottom: 0.5rem;
+}
+.team-card .card-footer {
+  padding-top: 0.25rem;
+}
+
+/* Navbar active link override */
+.navbar .nav-link.active {
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+
+
+.nav-on-hero {
+  position: relative;   /* default flow; no “fixed” */
+  z-index: 1;           /* higher than the ::before overlay (z‑index:0) */
+}
+
+.call-to-action {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
+.navbar.position-absolute { z-index: 1; }

@@ -19,15 +19,17 @@ document.getElementById('contactForm').addEventListener('submit', function(e) {
     .then(data => {
 
         // Clear previous data
-        const resultContainer = document.getElementById('resultContainer');
-        resultContainer.innerHTML = '';
+        // const resultContainer = document.getElementById('resultContainer');
+        // resultContainer.innerHTML = '';
+
+        document.getElementById('resultModalBody').innerHTML = '';
 
         if (data.error) {
             alert(`Error: ${data.error}`);
         } else {
             // Display results in a user-friendly way
             // const resultDiv = document.createElement('div');
-            let resultHTML = '<h3>Diagnosis (Top 3):</h3>';
+            let resultHTML = '<h4 class="mb-3">Top&nbsp;3 predictions</h4>';
 
             data.top3.forEach((item, index) => {
                 // e.g. item.class == "6. Melanoma"
@@ -35,16 +37,32 @@ document.getElementById('contactForm').addEventListener('submit', function(e) {
                 const nameParts = item.class.split('. ');
                 const diseaseName = (nameParts.length > 1) ? nameParts[1] : item.class;
                 
-                resultHTML += `
-                    <p>
-                      <strong>#${index + 1}:</strong> ${diseaseName}
-                      <br>
-                      <strong>Confidence:</strong> ${(item.confidence * 100).toFixed(2)}%
-                    </p>
-                `;
-            });
+                // ----‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑
+                //  Create a PubMed link for the disease
+                // ----‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑
+                const query = encodeURIComponent(diseaseName);
+                const pubmedURL = `https://pubmed.ncbi.nlm.nih.gov/?term=${query}`;
 
-            resultContainer.innerHTML = resultHTML;
+                resultHTML += `
+                    <p class="mb-3">
+                        <strong>#${index + 1}:</strong>
+                        <a href="${pubmedURL}" target="_blank" rel="noopener noreferrer">
+                        ${diseaseName}
+                        </a><br>
+                        <strong>Confidence:</strong> ${(item.confidence * 100).toFixed(2)}%
+                    </p>`;
+            });
+            
+            // Inject HTML into the modal body
+            document.getElementById('resultModalBody').innerHTML = resultHTML;
+
+            // Show the modal
+            const resultModal = new bootstrap.Modal(
+                document.getElementById('resultModal')
+            );
+            resultModal.show();
+
+            //resultContainer.innerHTML = resultHTML;
             //document.querySelector('.text-center').appendChild(resultDiv);
         }
     })
