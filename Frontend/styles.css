@@ -10928,7 +10928,7 @@ footer.footer {
 .masthead--about {
   background-image: url('assets/img/bg-masthead.jpg');
   background-size: cover;
-  background-position: center;
+  background-position: center 70%;
   height: 60vh;
   position: relative;
 }
@@ -10959,6 +10959,7 @@ footer.footer {
 .team-card img {
   border-top-left-radius: 1rem;
   border-top-right-radius: 1rem;
+  object-position: center 28%;
   height: 260px;
   object-fit: cover;
 }
@@ -10989,3 +10990,4 @@ footer.footer {
 }
 
 .navbar.position-absolute { z-index: 1; }
+
