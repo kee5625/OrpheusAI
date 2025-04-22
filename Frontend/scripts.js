@@ -5,96 +5,104 @@ document.getElementById('contactForm').addEventListener('submit', function (e) {
     const file = fileInput.files[0];
     const submitBtn = document.getElementById('submitButton');
 
-    if (!file) {
-        alert('Please upload a file.');
+    if (!file || !file.type.startsWith('image/')) {
+        alert('Please upload a valid image file.');
         return;
     }
 
     const formData = new FormData();
+    formData.append('image', file);
     submitBtn.disabled = true;
     submitBtn.innerHTML = 'Processing...';
 
-    // Check type and route to proper API
-    if (file.type.startsWith('image/')) {
-        formData.append('image', file);
-
-        fetch('http://localhost:5000/predict', {
-            method: 'POST',
-            body: formData
-        })
+    fetch('http://localhost:5000/predict', {
+        method: 'POST',
+        body: formData
+    })
         .then(response => response.json())
         .then(data => {
-            document.getElementById('resultModalBody').innerHTML = '';
+            const resultContainer = document.getElementById('resultModalBody');
+            resultContainer.innerHTML = '';
 
             if (data.error) {
                 alert(`Error: ${data.error}`);
             } else {
-                let resultHTML = '<h4 class="mb-3">Top&nbsp;3 predictions</h4>';
-
-                data.top3.forEach((item, index) => {
-                    const nameParts = item.class.split('. ');
-                    const diseaseName = nameParts.length > 1 ? nameParts[1] : item.class;
-                    const pubmedURL = `https://pubmed.ncbi.nlm.nih.gov/?term=${encodeURIComponent(diseaseName)}`;
-
+                let resultHTML = '<h4 class="mb-3">Top 3 Predictions</h4>';
+                data.top3.forEach((item, idx) => {
+                    const name = item.class.split('. ')[1] || item.class;
+                    const pubmedURL = `https://pubmed.ncbi.nlm.nih.gov/?term=${encodeURIComponent(name)}`;
                     resultHTML += `
                         <p class="mb-3">
-                            <strong>#${index + 1}:</strong>
-                            <a href="${pubmedURL}" target="_blank" rel="noopener noreferrer">${diseaseName}</a><br>
+                            <strong>#${idx + 1}:</strong> <a href="${pubmedURL}" target="_blank">${name}</a><br>
                             <strong>Confidence:</strong> ${(item.confidence * 100).toFixed(2)}%
                         </p>`;
                 });
+                resultContainer.innerHTML = resultHTML;
 
-                document.getElementById('resultModalBody').innerHTML = resultHTML;
-                new bootstrap.Modal(document.getElementById('resultModal')).show();
+                // Show diagnosis modal
+                const modal = new bootstrap.Modal(document.getElementById('resultModal'));
+                modal.show();
             }
         })
-        .catch(err => {
-            console.error(err);
+        .catch(error => {
+            console.error('Image Upload Error:', error);
             alert('An error occurred while processing the image.');
         })
         .finally(() => {
             submitBtn.disabled = false;
             submitBtn.innerHTML = 'Submit';
         });
+});
 
-    } else if (file.type === 'application/pdf') {
-        formData.append('pdf', file);
+document.getElementById('labUploadForm').addEventListener('submit', function (e) {
+    e.preventDefault();
 
-        fetch('http://localhost:5000/analyze_pdf', {
-            method: 'POST',
-            body: formData
-        })
+    const fileInput = document.getElementById('labFileUpload');
+    const file = fileInput.files[0];
+    const submitBtn = document.getElementById('labSubmitBtn');
+
+    if (!file || file.type !== 'application/pdf') {
+        alert('Please upload a valid PDF file.');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('pdf', file);
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = 'Analyzing...';
+
+    fetch('http://localhost:5000/analyze_pdf', {
+        method: 'POST',
+        body: formData
+    })
         .then(response => response.json())
         .then(data => {
-            document.getElementById('pdfResultModalBody').innerHTML = '';
+            const resultContainer = document.getElementById('pdfResultModalBody');
+            resultContainer.innerHTML = '';
 
             if (data.error) {
                 alert(`Error: ${data.error}`);
             } else {
-                const keywords = data.keywords.map(word => `<li>${word}</li>`).join('');
+                const keywords = data.keywords.map(k => `<li>${k}</li>`).join('');
                 const resultHTML = `
-                    <h4 class="mb-3">PDF Summary</h4>
+                    <h4 class="mb-3">Lab Report Summary</h4>
                     <p>${data.summary}</p>
                     <h5>Key Terms:</h5>
                     <ul>${keywords}</ul>
                 `;
+                resultContainer.innerHTML = resultHTML;
 
-                document.getElementById('pdfResultModalBody').innerHTML = resultHTML;
-                new bootstrap.Modal(document.getElementById('pdfResultModal')).show();
+                // Show PDF modal
+                const modal = new bootstrap.Modal(document.getElementById('pdfResultModal'));
+                modal.show();
             }
         })
-        .catch(err => {
-            console.error(err);
-            alert('An error occurred while processing the PDF.');
+        .catch(error => {
+            console.error('PDF Upload Error:', error);
+            alert('An error occurred while analyzing the PDF.');
         })
         .finally(() => {
             submitBtn.disabled = false;
-            submitBtn.innerHTML = 'Submit';
+            submitBtn.innerHTML = 'Analyze';
         });
-
-    } else {
-        alert('Unsupported file type. Please upload an image or PDF.');
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = 'Submit';
-    }
 });
