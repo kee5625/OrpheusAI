@@ -8,13 +8,38 @@ from keras.preprocessing import image
 
 from flask_cors import CORS
 
+import fitz #PyMuPDF (analysis)
+from collections import Counter
+import re
+
+def extract_text_from_pdf(pdf_path):
+    text = ""
+    with fitz.open(pdf_path) as doc:
+        for page in doc:
+            text += page.get_text()
+    return text
+
+def simple_summary(text, top_n=5):
+    # Tokenize and clean
+    words = re.findall(r'\b\w+\b', text.lower())
+    stopwords = set([
+        'the', 'and', 'of', 'to', 'a', 'in', 'for', 'on', 'is', 'with',
+        'that', 'as', 'by', 'an', 'this', 'from', 'be', 'at', 'are'
+    ])
+    keywords = [word for word in words if word not in stopwords]
+    
+    # Frequency count
+    most_common = Counter(keywords).most_common(top_n)
+    summary = "Key Terms: " + ", ".join([word for word, _ in most_common])
+    return summary
+
 app = Flask(__name__, static_folder='../Frontend', static_url_path='')
 
 CORS(app)
 
 # Configuration
 UPLOAD_FOLDER = 'uploads'
-ALLOWOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'bmp'}
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'bmp'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # Load the trained model
@@ -36,7 +61,7 @@ CLASS_NAMES = [
 
 def allowed_file(filename):
     return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWOWED_EXTENSIONS
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def preprocess_image(img_path):
     img = cv2.imread(img_path)
@@ -93,6 +118,40 @@ def predict():
             return jsonify({'error': str(e)}), 500
             
     return jsonify({'error': 'File type not allowed'}), 400
+
+@app.route('/analyze_pdf', methods=['POST'])
+def analyze_pdf():
+    if 'pdf' not in request.files:
+        return jsonify({'error': 'No PDF uploaded'}), 400
+    
+    file = request.files['pdf']
+    if file.filename == '' or not file.filename.lower().endswith('.pdf'):
+        return jsonify({'error': 'Invalid file type. Only PDFs allowed.'}), 400
+    
+    filename = secure_filename(file.filename)
+    upload_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    file.save(upload_path)
+    
+    try:
+        # Step 1: Extract raw text
+        text = extract_text_from_pdf(upload_path)
+
+        # Step 2: Generate a simple summary (keyword-based)
+        summary = simple_summary(text)
+
+        # Optional: Extract some example keywords
+        keywords = summary.replace("Key Terms: ", "").split(", ")
+
+        # Clean up file
+        os.remove(upload_path)
+
+        return jsonify({
+            "summary": summary,
+            "keywords": keywords
+        })
+    
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     # Create upload folder if it doesn't exist
