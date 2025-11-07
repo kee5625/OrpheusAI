@@ -19,19 +19,29 @@ def extract_text_from_pdf(pdf_path):
             text += page.get_text()
     return text
 
+def split_into_sections(text):
+    sections = {}
+    # Define section headers (case-insensitive, newline-based)
+    pattern = r'(?i)(clinical summary:|histopathology:|impression:)'
+    parts = re.split(pattern, text)
+    
+    # parts will be something like: ["before", "Clinical Summary", "...", "Histopathology", "...", "Impression", "..."]
+    for i in range(1, len(parts), 2):
+        header = parts[i].strip().replace(":", "").title()
+        content = parts[i + 1].strip() if i + 1 < len(parts) else ''
+        sections[header] = content
+    
+    return sections
+
 def simple_summary(text, top_n=5):
-    # Tokenize and clean
     words = re.findall(r'\b\w+\b', text.lower())
     stopwords = set([
         'the', 'and', 'of', 'to', 'a', 'in', 'for', 'on', 'is', 'with',
-        'that', 'as', 'by', 'an', 'this', 'from', 'be', 'at', 'are'
+        'that', 'as', 'by', 'an', 'this', 'from', 'be', 'at', 'are', 'has', 'have', 'was'
     ])
     keywords = [word for word in words if word not in stopwords]
-    
-    # Frequency count
     most_common = Counter(keywords).most_common(top_n)
-    summary = "Key Terms: " + ", ".join([word for word, _ in most_common])
-    return summary
+    return ", ".join([word for word, _ in most_common])
 
 app = Flask(__name__, static_folder='../Frontend', static_url_path='')
 
@@ -123,34 +133,45 @@ def predict():
 def analyze_pdf():
     if 'pdf' not in request.files:
         return jsonify({'error': 'No PDF uploaded'}), 400
-    
+
     file = request.files['pdf']
     if file.filename == '' or not file.filename.lower().endswith('.pdf'):
         return jsonify({'error': 'Invalid file type. Only PDFs allowed.'}), 400
-    
+
     filename = secure_filename(file.filename)
     upload_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     file.save(upload_path)
-    
+
     try:
-        # Step 1: Extract raw text
         text = extract_text_from_pdf(upload_path)
+        print("=== Extracted Text ===")
+        print(text)
 
-        # Step 2: Generate a simple summary (keyword-based)
-        summary = simple_summary(text)
+        sections = split_into_sections(text)
+        print("=== Sections Extracted ===")
+        print(sections)
 
-        # Optional: Extract some example keywords
-        keywords = summary.replace("Key Terms: ", "").split(", ")
+        if not sections:
+            print("No sections matched. Using fallback.")
+            sections = {'Full Report': text}
 
-        # Clean up file
+        summarized_sections = sections 
+
+        keywords = []
+        for summary in summarized_sections.values():
+            if summary.strip():
+                keywords.extend(summary.split(", "))
+
         os.remove(upload_path)
 
         return jsonify({
-            "summary": summary,
-            "keywords": keywords
+            "summary": summarized_sections,
+            "all_keywords": list(set(word for section in sections.values() for word in section.split()))
         })
-    
+
     except Exception as e:
+        print("=== Exception Occurred ===")
+        print(str(e))
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':

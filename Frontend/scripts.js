@@ -83,12 +83,14 @@ document.getElementById('labUploadForm').addEventListener('submit', function (e)
             if (data.error) {
                 alert(`Error: ${data.error}`);
             } else {
-                const keywords = data.keywords.map(k => `<li>${k}</li>`).join('');
+                //const keywords = Array.isArray(data.all_keywords)
+                    //? data.all_keywords.map(k => `<li>${k}</li>`).join('')
+                    //: '<li>No keywords found.</li>';
                 const resultHTML = `
-                    <h4 class="mb-3">Lab Report Summary</h4>
-                    <p>${data.summary}</p>
-                    <h5>Key Terms:</h5>
-                    <ul>${keywords}</ul>
+                    <p>${Object.entries(data.summary).map(([section, content]) => `
+                        <h5>${section}</h5>
+                        <p>${content}</p>
+                    `).join('')}</p>
                 `;
                 resultContainer.innerHTML = resultHTML;
 
